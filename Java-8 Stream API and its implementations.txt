@@ -1,0 +1,56 @@
+Java 8 Stream API
+
+Stream API interfaces found in java.util.stream package. 
+Stream have dedicated primitive types classes - IntStream, LongStream, DoubleStream etc.
+Stream doesn't store data and oprates on in mamory data structure - Collections and array.
+Functional Interface is the foundation of JAVA 8 Stream API and is best suited for utilization of lambda expression.
+Stream API in java 8 works on the principle of internal itration which helps in lazy-seakiing stream operations such as- filtering, mapping or duplicate removing. This lazy implementation results in high performance and scope of optimization.
+Stream API is form of data structure which is computed on - demand. This makes Stream single time consumable and no further reuse of same stream is possible.
+Java 8 Stream supports sequential as well as paralell Streaming. Paralell Streaming helps in achieving high preformance for large collections.
+
+
+Functional Interface in Java 8 
+
+This interface contains only one abstract mathod, which means they have only one functionality that can be exposed with implemented classes.
+Functional Interface can have n number of default methods
+Lambda expression in java 8 provide representation for reference of functional interface.
+Examples :- Runnable, comparable, ActionListner
+
+
+<R> Stream<R> map(Function<? super T, ? extends R> mapper)
+IntStream mapToInt(ToIntFunction<? super T> mapper) – similarly for long and double returning primitive specific stream.
+IntStream flatMapToInt(Function<? super T, ? extends IntStream> mapper) – similarly for long and double
+<A> A[] toArray(IntFunction<A[]> generator)
+<U> U reduce(U identity, BiFunction<U, ? super T, U> accumulator, BinaryOperator<U> combiner)
+
+Predicate Interface in java 8
+
+Stream<T> filter(Predicate<? super T> predicate)
+boolean anyMatch(Predicate<? super T> predicate)
+boolean allMatch(Predicate<? super T> predicate)
+boolean noneMatch(Predicate<? super T> predicate)
+
+java.util.Optional in java 8 
+  - Java Optional is a container object which may or may not contain a non-null value.
+  - If a value is present, isPresent() will return true and get() will return the value.
+
+Optional<T> reduce(BinaryOperator<T> accumulator)
+Optional<T> min(Comparator<? super T> comparator)
+Optional<T> max(Comparator<? super T> comparator)
+Optional<T> findFirst()
+Optional<T> findAny()
+
+java.util.Spliterator
+
+For supporting parallel execution in Java 8 Stream API, Spliterator interface is used. 
+Spliterator trySplit method returns a new Spliterator that manages a subset of the elements of the original Spliterator.
+
+
+Java Stream Intermediate and Terminal Operations
+
+Commonly used terminal methods are forEach, toArray, min, max, findFirst, anyMatch, allMatch etc.
+You can identify terminal methods from the return type, they will never return a Stream.
+
+Java Stream Short Circuiting Operations:-
+limit() and skip() are two short circuiting intermediate operations.
+anyMatch, allMatch, noneMatch, findFirst and findAny are short circuiting terminal operations.
