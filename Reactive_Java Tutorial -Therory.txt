@@ -1,0 +1,47 @@
+The reactive-stack web framework, Spring WebFlux, has been added Spring 5.0
+runs on such servers as Netty, Undertow, and Servlet 3.1+ containers
+promotes an asynchronous, non-blocking, event-driven approach to data processing.
+
+
+Blocking vs non-blocking (async) request processing
+
+	 Blocking request processing - synchronous request processing.
+	 
+	 Non-blocking request processing- In non-blocking or asynchronous request processing, no thread is in waiting state. There is generally only one request thread receiving the request.
+	 
+		All incoming requests come with a event handler and call back information. Request thread delegates the incoming requests to a thread pool (generally small number of threads) 
+		which delegate the request to it’s handler function and immediately start processing other incoming requests from request thread.
+		When the handler function is complete, one of thread from pool collect the response and pass it to the call back function.
+		
+		Non-blocking:- helps in scaling the performance of the application. 
+					   Small number of threads
+					   less memory utilization 
+					   also less switching as well.
+					   
+					   
+What is reactive programming?
+In reactive style of programming, we make a request for resource and start performing other things. 
+When the data is available, we get the notification along with data inform of call back function. 
+In callback function, we handle the response as per application/user needs.
+
+Two popular implementations of reactive streams :-1) RxJava (https://github.com/ReactiveX/RxJava) 
+												  2) Project Reactor (https://projectreactor.io/).
+
+What is Spring WebFlux ?
+Spring WebFlux is parallel version of Spring MVC and supports fully non-blocking reactive streams.
+It support the back pressure concept and uses Netty as inbuilt server to run reactive applications.
+
+Spring webflux uses project reactor as reactive library. Reactor is a Reactive Streams library and, therefore, all of its operators support non-blocking back pressure.
+
+Spring WebFlux heavily uses two publishers :
+ 1) Mono: Returns 0 or 1 element.
+		Mono<String> mono = Mono.just("Alex");
+		Mono<String> mono = Mono.empty();
+ 2) Flux: Returns 0…N elements.
+	Flux<String> flux = Flux.just("A", "B", "C");
+	Flux<String> flux = Flux.fromArray(new String[]{"A", "B", "C"});
+	Flux<String> flux = Flux.fromIterable(Arrays.asList("A", "B", "C"));
+	 
+	//To subscribe call method
+	 
+	flux.subscribe();
