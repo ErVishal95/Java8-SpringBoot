@@ -135,4 +135,214 @@ The @Table annotation provides four attributes, allowing you to override the nam
 @Basic (fetch = FetchType.LAZY, optional = false) - to make a column as not null. 
 @Column(name="FNAME",length=100,nullable=false)
 @Transient - Fields that are used at run time can be discarded from object as they already persist in database, use @Transient on such fields.
-@Temporal(TemporalType.TIME)
+@Temporal(TemporalType.TIME) - used for geting the specific fragment of a timestamp in form of date, time, TimeStamp
+@Lob - String and charactor based large data can be stored with this annotation
+@Order - allow data to be order once it has been retrieved from database
+@ordercolumn - allow ordering of appropriate collection type to be maintained in database
+@NamedQuery - allow one or more HQL/ JPQL queries to be associated with an entity
+
+	@Entity
+	@NamedQuery(
+			name="findAuthorsByName",
+			query="from Author where name = :author"
+	)
+
+@Version - control versioning or concurency
+
+@OrderBy("firstName asc") - it will sort data of collection with firstName in asscending order
+
+@OneToOne/ @ManyToMany - used when two entities are one to one dependent on each others
+-	@PrimaryKeyJoinColumn - used when two entities share same primary key 
+-	@JoinColumn - used when foregn key is held by one of the entity
+	-	@MapedBy - used along with @JoinColumn and @OneToOne annotations to achieve Bi-directional relationship
+			
+		**********************  Use of @PrimaryKeyJoinColumn
+			@Entity
+			@Table(name = "company")
+			public class Company implements Serializable {
+			   
+			  @Id
+			  @Column(name = "id")
+			  @GeneratedValue
+			  private int id;
+			   
+			  @OneToOne(cascade = CascadeType.MERGE)
+			  @PrimaryKeyJoinColumn
+			  private CompanyDetail companyDetail;
+			   
+			  ...
+			}
+			 
+			@Entity
+			@Table(name = "companyDetail")
+			public class CompanyDetail implements Serializable {
+			 
+			  @Id
+			  @Column(name = "id")
+			  private int id;
+			   
+			  ...
+			}
+		
+		************************* Use of @JoinColumn
+		
+		@Entity
+		@Table(name = "contactDetail")
+		public class ContactDetail implements Serializable {
+		 
+		  @Id
+		  @Column(name = "id")
+		  @GeneratedValue
+		  private int id;
+		   
+		  @OneToOne
+		  @MapsId
+		  @JoinColumn(name = "contactId")
+		  private Contact contact;
+		   
+		  ...
+		}
+		 
+		@Entity
+		@Table(name = "contact")
+		public class Contact implements Serializable {
+		 
+		  @Id
+		  @Column(name = "ID")
+		  @GeneratedValue
+		  private Integer id;
+		 
+		  @OneToOne(mappedBy = "contact", cascade = CascadeType.ALL)
+		  private ContactDetail contactDetail;
+		 
+		  ....
+		}
+		
+@ManyToOne - Used when one entity is dependent on another entity with many to one relationship
+-	@JoinColumn - Use this annotation when foreign key is held by one entity (especialy when dependent entity have a field marked as foriegn key which is a primary key of another entity)
+-	@JoinTable - use this in case entities associated via association table
+
+	**************** Use of Join Coumn
+		@Entity
+		@Table(name = "contact")
+		public class Contact implements Serializable {
+		 
+		  @ManyToOne
+		  @JoinColumn(name = "companyId")
+		  private Company company;
+		   
+		  ...
+		   
+		 }
+	
+	***************** Use of @JoinTable
+		@OneToOne(cascade = CascadeType.ALL)
+		@JoinTable(name="EMPLOYEE_ACCCOUNT", joinColumns = @JoinColumn(name="EMPLOYEE_ID"),
+		inverseJoinColumns = @JoinColumn(name="ACCOUNT_ID"))
+		private AccountEntity account;
+		
+@OneToMany - used in vice versa of ManyToOne or when an entity can be mapped to many entities
+-	@JoinColumn - Used when dependent entity have a field marked as foriegn key which is a primary key of another entity
+
+
+		@Entity(name = "ForeignKeyAssoEntity")
+		@Table(name = "Employee", uniqueConstraints = {
+		@UniqueConstraint(columnNames = "ID"),
+		@UniqueConstraint(columnNames = "EMAIL") })
+		public class EmployeeEntity implements Serializable {
+		 
+			private static final long serialVersionUID = -1798070786993154676L;
+		 
+			@Id
+			@GeneratedValue(strategy = GenerationType.IDENTITY)
+			@Column(name = "ID", unique = true, nullable = false)
+			private Integer employeeId;
+		 
+			@Column(name = "EMAIL", unique = true, nullable = false, length = 100)
+			private String email;
+		 
+			@Column(name = "FIRST_NAME", unique = false, nullable = false, length = 100)
+			private String firstName;
+		 
+			@Column(name = "LAST_NAME", unique = false, nullable = false, length = 100)
+			private String lastName;
+		 
+			@OneToMany(cascade=CascadeType.ALL)
+			@JoinColumn(name="EMPLOYEE_ID")
+			private Set<AccountEntity> accounts;
+		
+		 - - - - - - - - - - - - - - - - - - - - - - -
+		 
+		@Entity(name = "ForeignKeyAssoAccountEntity")
+		@Table(name = "ACCOUNT", uniqueConstraints = {
+		@UniqueConstraint(columnNames = "ID")})
+		public class AccountEntity implements Serializable
+		{
+			private static final long serialVersionUID = -6790693372846798580L;
+		 
+			@Id
+			@GeneratedValue(strategy = GenerationType.IDENTITY)
+			@Column(name = "ID", unique = true, nullable = false)
+			private Integer accountId;
+		 
+			@Column(name = "ACC_NUMBER", unique = true, nullable = false, length = 100)
+			private String accountNumber;
+		 
+			@ManyToOne
+			private EmployeeEntity employee;
+			
+-	@JoinTable - use this in case entities associated via association table
+
+		@Entity(name = "JoinTableEmployeeEntity")
+		@Table(name = "Employee", uniqueConstraints = {
+		@UniqueConstraint(columnNames = "ID"),
+		@UniqueConstraint(columnNames = "EMAIL") })
+		public class EmployeeEntity implements Serializable
+		{
+			private static final long serialVersionUID = -1798070786993154676L;
+		 
+			@Id
+			@GeneratedValue(strategy = GenerationType.IDENTITY)
+			@Column(name = "ID", unique = true, nullable = false)
+			private Integer employeeId;
+		 
+			@Column(name = "EMAIL", unique = true, nullable = false, length = 100)
+			private String email;
+		 
+			@Column(name = "FIRST_NAME", unique = false, nullable = false, length = 100)
+			private String firstName;
+		 
+			@Column(name = "LAST_NAME", unique = false, nullable = false, length = 100)
+			private String lastName;
+		 
+			@OneToMany(cascade=CascadeType.ALL)
+			@JoinTable(name="EMPLOYEE_ACCOUNT", joinColumns={@JoinColumn(name="EMPLOYEE_ID", referencedColumnName="ID")}
+			, inverseJoinColumns={@JoinColumn(name="ACCOUNT_ID", referencedColumnName="ID")})
+			private Set<AccountEntity> accounts;
+			
+			- - - - - - - - - - - - - - - - - - - -
+			
+			@Entity(name = "JoinTableAccountEntity")
+			@Table(name = "ACCOUNT", uniqueConstraints = {
+			@UniqueConstraint(columnNames = "ID")})
+			public class AccountEntity implements Serializable
+			{
+			 
+				private static final long serialVersionUID = -6790693372846798580L;
+			 
+				@Id
+				@GeneratedValue(strategy = GenerationType.IDENTITY)
+				@Column(name = "ID", unique = true, nullable = false)
+				private Integer accountId;
+			 
+				@Column(name = "ACC_NUMBER", unique = true, nullable = false, length = 100)
+				private String accountNumber;
+				
+Hibernate Inheritance Mapping Annotations:- 
+
+@Inheritance
+@DiscriminatorColumn
+@DiscriminatorValue
+
+
+https://howtodoinjava.com/hibernate/hibernate-jpa-2-persistence-annotations-tutorial/
