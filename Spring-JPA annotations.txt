@@ -1,0 +1,372 @@
+Java 7,
+Java 8,
+Spring MVC,
+JPA - Hibernate,
+PL/SQL - proceddures
+
+
+java 8 :-
+Stream API,
+Functional Interface,
+Lambda expression,
+ForEach() Method
+Predicates and filters
+Stream API aggrigate functions - list.stream.map(Class<T> :: getter).max(Comparator.naturalOrder());
+																	.min(Comparator.naturalOrder());
+																	.findFirst();
+																	.sorted();
+																	.sorted().findFirst();
+																	.sorted(Comparator.reverseOrder());
+																	.sorted(Comparator.reverseOrder()).findFirst();
+																	.sorted().distince();
+																	.sorted.limit(5/ any number);
+																	.count();
+									.stream().map(Employee:: getSalary).reduce(Float:: max);
+									.stream().map(Employee:: getSalary).mapToDouble(i-> i).sum();
+									.stream().map(Employee:: getSalary)
+															.mapToDouble( i-> i)
+															.average().ifPresent(avg -> System.out.println("Average of salary is: "+avg));
+																	
+Predicate examples:-
+
+- public static Predicate<Employee> checkAgeLesserThen(Optional<Integer> age){
+		return p-> p.getAge() < age.get()-20;
+	}
+
+- public static Predicate<Employee> isAgeGreaterThenAndDepartmentIs(int age, String department){
+		return p-> p.getAge() > age && p.getDepartment().equalsIgnoreCase(department);
+	}
+	
+Filters:-
+
+- public static List<Employee> filterEmployee(List<Employee> employees, Predicate<Employee> predicate){
+		return employees.stream().filter(predicate).collect(Collectors.<Employee>toList());
+	}
+
+implementation:-
+-	Optional<Integer> maxAge = emplist.stream().map(Employee:: getAge).max(Comparator.naturalOrder());	//Max Age
+		System.out.println(maxAge);
+		
+-		System.out.println(filterEmployee(emplist, checkAgeLesserThen(maxAge)));	
+		
+-	System.out.println(filterEmployee(emplist, isAgeGreaterThenAndDepartmentIs(25, "IT")));
+
+
+Spring MVC & SpringBoot:-
+
+Core Annotations-
+
+@configuration - used to mark a class as source of Bean Definition, beans are the component that we need to wire.
+@Bean - this annotation is a bean producer used along with @configuration annotation.
+@componentScan - scan for the spring packages configured with it for @configuration classes.
+@component - used for making a class as Spring Bean at auto - scan time.
+@service - more specialised annotation of @component annotation.
+@Autowire - to wire application component together, @Autowire annotation is used over - field, constructor, and mthods
+@Lazy - Used for Lazy initialization or ondemand initialization. By default bean initialization is eager.
+@Qualifier - can be used along with @Autowire annotation marked field if same field can be wired with multiple beans and one specific bean is required out of all available beans
+@value - can be used to set the default value of a field.
+@Required - if dependency injection need to be varified while wiring the bean using @Autowire annotation in more robust way, @Required annotation is best to use.
+@Repository - used for dao operations and establishing the connection with database
+
+SpringBoot and Web Annotations-
+
+@SpringBootApplication - combination of (@configuration, @componentScan, @EnableAutoConfiguration)
+@EnableAutoConfiguration - it helps Spring to guess configuration based on jars available at classpath.
+
+@Controller - mark the class as web controller and handles the http requests
+@ResponseBody - helps in binding the response for an incomming http reuest.
+@RestController - combination of @Controller and @ResponseBody annotations
+@RequestMapping(method = RequestMethod.Type, value = "/path") - used to get the path responsible for serving the Http requests 
+@PathVariable("placeHolderName") - used to bring the value from URL via '/' to the method argument
+@RequestParam/ @RequestParam(value = "value", required = false) - used to bring the value from URL via '?' or queries pased in the http requests to the method argument
+@GetMapping
+@PostMapping
+@PutMapping
+@DeleteMapping
+
+
+JPA & Hibrnate:-
+
+JPA 2.0 are available in javax.persistence package
+@Entity - mark the POJO class as JPA Entity Bean (non- argument constructor is required)
+@Id - Mark the field as primary Key, can be used over filed or getter method(best to use with getter as values can be modified easily via corresponding setter method)
+@GeneratedValue(Strategy = GenerationType.AUTO) - Used for taking the primary key generation strategy.(By default generation strategy is AUTO)
+@GeneratedValue(Strategy = GenerationType.IDENTITY) - database determine and assign the next primary key
+@GeneratedValue(Strategy = GenerationType.TABLE) - IT keeps a saperate table with primary key values (@TableGenerator)
+@GeneratedValue(Strategy = GenerationType.SEQUENCE) - Some databases support a SEQUENCE column type. It uses @SequenceGenerator
+
+	SEQUENCE	@Id
+				@SequenceGenerator(name="seq1",sequenceName="HIB_SEQ")
+				@GeneratedValue(strategy=SEQUENCE,generator="seq1")
+				private Integer employeeId;
+				
+	Table		@Id
+				@GeneratedValue(strategy=GenerationType.TABLE , generator="employee_generator")
+				@TableGenerator(name="employee_generator",
+							   table="pk_table",
+							   pkColumnName="name",
+							   valueColumnName="value",
+							   allocationSize=100)
+				private Integer employeeId;
+				
+@Embeddable - for multi-column primary key, You must create a class to represent this primary key. mark this class with @Embeddable (this calss will have a field annotated with @Id annotation for primary key)
+@EmbeddableId - used for composite primary key via class annotated with @Embeddable annotaion
+@Table - The Table name thate need to be stored in DB can be customised further with this annotation. 
+The @Table annotation provides four attributes, allowing you to override the name of the table, its catalog, and its schema, and to enforce unique constraints on columns in the table.
+@SecondaryTable - Can be used to draw an attribute/field in an entity from secondry table
+@Column - at the time of drawing attribute from secodry table into an entity, the attribute must be marked with @Column annotation with a table attribute identifying the table.
+	
+	@Entity
+	@Table(name = "employee")
+	@SecondaryTable(name = "employee_details")
+	public class EmployeeEntity implements Serializable
+	{
+	   @Id
+	   @GeneratedValue (strategy = GenerationType.SEQUENCE)
+	   private Integer employeeId;
+	   private String  firstName;
+	   private String  lastName;
+	 
+	   @Column(table = "employee_details")
+	   public String address;
+	}
+
+@UniqueConstraint - 
+@Basic (fetch = FetchType.LAZY, optional = false) - to make a column as not null. 
+@Column(name="FNAME",length=100,nullable=false)
+@Transient - Fields that are used at run time can be discarded from object as they already persist in database, use @Transient on such fields.
+@Temporal(TemporalType.TIME) - used for geting the specific fragment of a timestamp in form of date, time, TimeStamp
+@Lob - String and charactor based large data can be stored with this annotation
+@Order - allow data to be order once it has been retrieved from database
+@ordercolumn - allow ordering of appropriate collection type to be maintained in database
+@NamedQuery - allow one or more HQL/ JPQL queries to be associated with an entity
+
+	@Entity
+	@NamedQuery(
+			name="findAuthorsByName",
+			query="from Author where name = :author"
+	)
+
+@Version - control versioning or concurency
+
+@OrderBy("firstName asc") - it will sort data of collection with firstName in asscending order
+
+@OneToOne/ @ManyToMany - used when two entities are one to one dependent on each others
+-	@PrimaryKeyJoinColumn - used when two entities share same primary key 
+-	@JoinColumn - used when foregn key is held by one of the entity
+	-	@MapedBy - used along with @JoinColumn and @OneToOne annotations to achieve Bi-directional relationship
+			
+		**********************  Use of @PrimaryKeyJoinColumn
+			@Entity
+			@Table(name = "company")
+			public class Company implements Serializable {
+			   
+			  @Id
+			  @Column(name = "id")
+			  @GeneratedValue
+			  private int id;
+			   
+			  @OneToOne(cascade = CascadeType.MERGE)
+			  @PrimaryKeyJoinColumn
+			  private CompanyDetail companyDetail;
+			   
+			  ...
+			}
+			 
+			@Entity
+			@Table(name = "companyDetail")
+			public class CompanyDetail implements Serializable {
+			 
+			  @Id
+			  @Column(name = "id")
+			  private int id;
+			   
+			  ...
+			}
+		
+		************************* Use of @JoinColumn
+		
+		@Entity
+		@Table(name = "contactDetail")
+		public class ContactDetail implements Serializable {
+		 
+		  @Id
+		  @Column(name = "id")
+		  @GeneratedValue
+		  private int id;
+		   
+		  @OneToOne
+		  @MapsId
+		  @JoinColumn(name = "contactId")
+		  private Contact contact;
+		   
+		  ...
+		}
+		 
+		@Entity
+		@Table(name = "contact")
+		public class Contact implements Serializable {
+		 
+		  @Id
+		  @Column(name = "ID")
+		  @GeneratedValue
+		  private Integer id;
+		 
+		  @OneToOne(mappedBy = "contact", cascade = CascadeType.ALL)
+		  private ContactDetail contactDetail;
+		 
+		  ....
+		}
+		
+@ManyToOne - Used when one entity is dependent on another entity with many to one relationship. Default fetch type - EAGER
+-	@JoinColumn - Use this annotation when foreign key is held by one entity (especialy when dependent entity have a field marked as foriegn key which is a primary key of another entity)
+-	@JoinTable - use this in case entities associated via association table
+
+	**************** Use of Join Coumn
+		@Entity
+		@Table(name = "contact")
+		public class Contact implements Serializable {
+		 
+		  @ManyToOne
+		  @JoinColumn(name = "companyId")
+		  private Company company;
+		   
+		  ...
+		   
+		 }
+	
+	***************** Use of @JoinTable
+		@OneToOne(cascade = CascadeType.ALL)
+		@JoinTable(name="EMPLOYEE_ACCCOUNT", joinColumns = @JoinColumn(name="EMPLOYEE_ID"),
+		inverseJoinColumns = @JoinColumn(name="ACCOUNT_ID"))
+		private AccountEntity account;
+		
+@OneToMany - used in vice versa of ManyToOne or when an entity can be mapped to many entities.  Default fetch type - Lazy
+-	@JoinColumn - Used when dependent entity have a field marked as foreign key which is a primary key of another entity
+
+
+		@Entity(name = "ForeignKeyAssoEntity")
+		@Table(name = "Employee", uniqueConstraints = {
+		@UniqueConstraint(columnNames = "ID"),
+		@UniqueConstraint(columnNames = "EMAIL") })
+		public class EmployeeEntity implements Serializable {
+		 
+			private static final long serialVersionUID = -1798070786993154676L;
+		 
+			@Id
+			@GeneratedValue(strategy = GenerationType.IDENTITY)
+			@Column(name = "ID", unique = true, nullable = false)
+			private Integer employeeId;
+		 
+			@Column(name = "EMAIL", unique = true, nullable = false, length = 100)
+			private String email;
+		 
+			@Column(name = "FIRST_NAME", unique = false, nullable = false, length = 100)
+			private String firstName;
+		 
+			@Column(name = "LAST_NAME", unique = false, nullable = false, length = 100)
+			private String lastName;
+		 
+			@OneToMany(cascade=CascadeType.ALL)
+			@JoinColumn(name="EMPLOYEE_ID")
+			private Set<AccountEntity> accounts;
+		
+		 - - - - - - - - - - - - - - - - - - - - - - -
+		 
+		@Entity(name = "ForeignKeyAssoAccountEntity")
+		@Table(name = "ACCOUNT", uniqueConstraints = {
+		@UniqueConstraint(columnNames = "ID")})
+		public class AccountEntity implements Serializable
+		{
+			private static final long serialVersionUID = -6790693372846798580L;
+		 
+			@Id
+			@GeneratedValue(strategy = GenerationType.IDENTITY)
+			@Column(name = "ID", unique = true, nullable = false)
+			private Integer accountId;
+		 
+			@Column(name = "ACC_NUMBER", unique = true, nullable = false, length = 100)
+			private String accountNumber;
+		 
+			@ManyToOne
+			private EmployeeEntity employee;
+			
+-	@JoinTable - use this in case entities associated via association table
+
+		@Entity(name = "JoinTableEmployeeEntity")
+		@Table(name = "Employee", uniqueConstraints = {
+		@UniqueConstraint(columnNames = "ID"),
+		@UniqueConstraint(columnNames = "EMAIL") })
+		public class EmployeeEntity implements Serializable
+		{
+			private static final long serialVersionUID = -1798070786993154676L;
+		 
+			@Id
+			@GeneratedValue(strategy = GenerationType.IDENTITY)
+			@Column(name = "ID", unique = true, nullable = false)
+			private Integer employeeId;
+		 
+			@Column(name = "EMAIL", unique = true, nullable = false, length = 100)
+			private String email;
+		 
+			@Column(name = "FIRST_NAME", unique = false, nullable = false, length = 100)
+			private String firstName;
+		 
+			@Column(name = "LAST_NAME", unique = false, nullable = false, length = 100)
+			private String lastName;
+		 
+			@OneToMany(cascade=CascadeType.ALL)
+			@JoinTable(name="EMPLOYEE_ACCOUNT", joinColumns={@JoinColumn(name="EMPLOYEE_ID", referencedColumnName="ID")}
+			, inverseJoinColumns={@JoinColumn(name="ACCOUNT_ID", referencedColumnName="ID")})
+			private Set<AccountEntity> accounts;
+			
+			- - - - - - - - - - - - - - - - - - - -
+			
+			@Entity(name = "JoinTableAccountEntity")
+			@Table(name = "ACCOUNT", uniqueConstraints = {
+			@UniqueConstraint(columnNames = "ID")})
+			public class AccountEntity implements Serializable
+			{
+			 
+				private static final long serialVersionUID = -6790693372846798580L;
+			 
+				@Id
+				@GeneratedValue(strategy = GenerationType.IDENTITY)
+				@Column(name = "ID", unique = true, nullable = false)
+				private Integer accountId;
+			 
+				@Column(name = "ACC_NUMBER", unique = true, nullable = false, length = 100)
+				private String accountNumber;
+				
+Hibernate Inheritance Mapping Annotations:- 
+
+@Inheritance
+@DiscriminatorColumn
+@DiscriminatorValue
+
+
+https://howtodoinjava.com/hibernate/hibernate-jpa-2-persistence-annotations-tutorial/
+
+Hibernate DDL configuration values :-
+
+*	hibernate.hbm2ddl.auto
+	As per the documentation it can have four valid values:
+
+	create | update | validate | create-drop
+
+	Following is the explanation of the behaviour shown by these value:
+
+-	create :- create the schema, the data previously present (if there) in the schema is lost
+-	update:- update the schema with the given values.
+-	validate:- validate the schema. It makes no change in the DB.
+-	create-drop:- create the schema with destroying the data previously present(if there). It also drop the database schema when the SessionFactory is closed.
+	Following are the important points worth noting:
+
+-	In case of update, if schema is not present in the DB then the schema is created.
+-	In case of validate, if schema does not exists in DB, it is not created. Instead, it will throw an error:- Table not found:<table name>
+-	In case of create-drop, schema is not dropped on closing the session. It drops only on closing the SessionFactory.
+-	In case if i give any value to this property(say abc, instead of above four values discussed above) or it is just left blank. It shows following behaviour:
+
+	-If schema is not present in the DB:- It creates the schema
+
+	-If schema is present in the DB:- update the schema.
