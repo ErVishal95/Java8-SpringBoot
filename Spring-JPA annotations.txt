@@ -109,12 +109,15 @@ JPA 2.0 are available in javax.persistence package
 							   allocationSize=100)
 				private Integer employeeId;
 				
-@Embeddable - for multi-column primary key, You must create a class to represent this primary key. mark this class with @Embeddable (this calss will have a field annotated with @Id annotation for primary key)
-@EmbeddableId - used for composite primary key via class annotated with @Embeddable annotaion
-@Table - The Table name thate need to be stored in DB can be customised further with this annotation. 
+@Embeddable - for multi-column primary key, You must create a class to represent this primary key. mark this class with @Embeddable (this class will have a field annotated with @Id annotation for primary key)
+			  This one embeddable entity can be shared with multiple entities as per requirement.
+			  Entity annotated with @Embeddable should have no-argument constructor else error will occurs
+@Embedded	- Used while using the Embeddable entity as primary key for current entity.
+@EmbeddableId - used for composite primary key via class annotated with @Embeddable annotation. 
+@Table - The Table name that need to be stored in DB can be customized further with this annotation. 
 The @Table annotation provides four attributes, allowing you to override the name of the table, its catalog, and its schema, and to enforce unique constraints on columns in the table.
-@SecondaryTable - Can be used to draw an attribute/field in an entity from secondry table
-@Column - at the time of drawing attribute from secodry table into an entity, the attribute must be marked with @Column annotation with a table attribute identifying the table.
+@SecondaryTable - Can be used to draw an attribute/field in an entity from secondary table
+@Column - at the time of drawing attribute from secondary table into an entity, the attribute must be marked with @Column annotation with a table attribute identifying the table.
 	
 	@Entity
 	@Table(name = "employee")
@@ -147,13 +150,13 @@ The @Table annotation provides four attributes, allowing you to override the nam
 			query="from Author where name = :author"
 	)
 
-@Version - control versioning or concurency
+@Version - control versioning or concurrency
 
 @OrderBy("firstName asc") - it will sort data of collection with firstName in asscending order
 
 @OneToOne/ @ManyToMany - used when two entities are one to one dependent on each others
 -	@PrimaryKeyJoinColumn - used when two entities share same primary key 
--	@JoinColumn - used when foregn key is held by one of the entity
+-	@JoinColumn - used when foreign key is held by one of the entity
 	-	@MapedBy - used along with @JoinColumn and @OneToOne annotations to achieve Bi-directional relationship
 			
 		**********************  Use of @PrimaryKeyJoinColumn
@@ -217,12 +220,15 @@ The @Table annotation provides four attributes, allowing you to override the nam
 		 
 		  ....
 		}
-		
+@ManyToMany - We use @ManyToMany annotation to create a many-to-many relationship between two entities. 
+In a bi-directional association, the @ManyToMany annotation is used on both the entities but only one entity can be the owner of the relationship.
+The entity that specifies the @JoinTable is the owning side of the relationship and the entity that specifies the mappedBy attribute is the inverse side.
+
 @ManyToOne - Used when one entity is dependent on another entity with many to one relationship. Default fetch type - EAGER
--	@JoinColumn - Use this annotation when foreign key is held by one entity (especialy when dependent entity have a field marked as foriegn key which is a primary key of another entity)
+-	@JoinColumn - Use this annotation when foreign key is held by one entity (especially when dependent entity have a field marked as foreign key which is a primary key of another entity)
 -	@JoinTable - use this in case entities associated via association table
 
-	**************** Use of Join Coumn
+	**************** Use of Join Column
 		@Entity
 		@Table(name = "contact")
 		public class Contact implements Serializable {
@@ -242,6 +248,7 @@ The @Table annotation provides four attributes, allowing you to override the nam
 		private AccountEntity account;
 		
 @OneToMany - used in vice versa of ManyToOne or when an entity can be mapped to many entities.  Default fetch type - Lazy
+@OneToMany(Optional = false) - makes sure that no entity tuple can exist without entity that is going to be mapped in current entity.
 -	@JoinColumn - Used when dependent entity have a field marked as foreign key which is a primary key of another entity
 
 
@@ -370,3 +377,23 @@ Hibernate DDL configuration values :-
 	-If schema is not present in the DB:- It creates the schema
 
 	-If schema is present in the DB:- update the schema.
+	
+In Hibernate the default relationship FetchType is LAZY. 
+All to-one relationships use FetchType.EAGER and all to-many relationships FetchType.LAZY.
+
+************************************************************************************************************************************************
+
+JPA Cascade Types
+The cascade types supported by the Java Persistence Architecture are as below:
+
+CascadeType.PERSIST : cascade type presist means that save() or persist() operations cascade to related entities.
+CascadeType.MERGE : cascade type merge means that related entities are merged when the owning entity is merged.
+CascadeType.REFRESH : cascade type refresh does the same thing for the refresh() operation.
+CascadeType.REMOVE : cascade type remove removes all related entities association with this setting when the owning entity is deleted.
+CascadeType.DETACH : cascade type detach detaches all related entities if a “manual detach” occurs.
+CascadeType.ALL : cascade type all is shorthand for all of the above cascade operations.
+
+For Example taking the reference of Employee and ACCOUNT Entities:-
+- Any change happened on EmployeeEntity must cascade to AccountEntity as well. 
+- If you save an employee, then all associated accounts will also be saved into database. 
+
