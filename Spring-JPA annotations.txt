@@ -397,3 +397,104 @@ For Example taking the reference of Employee and ACCOUNT Entities:-
 - Any change happened on EmployeeEntity must cascade to AccountEntity as well. 
 - If you save an employee, then all associated accounts will also be saved into database. 
 
+NOTE:- When and Why you need to Implement equals() and hashCode() while using JPA
+		When we tried to implement a class's fields (Composite Key) as Primary Key of an Entity,
+		then JVM forces us to override and provide custom implementation of equals() & hashCode()
+		
+- You need to implement the equals() and hashCode() methods for primary key classes if you map composite primary keys. So, if use an entity as the key, it needs to provide both methods.
+
+-	Java’s default implementation of the equals() and hashCode() methods are based on the object’s identity.
+	That means that no two objects are equal and all of them have a different hash code value.
+
+-	Hibernate makes sure to return the same object if you read the same entity twice within a Session. 
+	Due to this, the default equals() and hashCode() implementations are OK as long as an entity stays in the context of one Session. 
+	So, in the following example, e1 and e2 are the same objects and the equals() method, therefore, returns true.
+
+		MyEntity e1 = em.find(MyEntity.class, id);
+		MyEntity e2 = em.find(MyEntity.class, id);
+		Assert.assertTrue(e1.equals(e2));
+		
+********************************************************************************************************************************************************
+
+Spring JPA Transaction Management
+Transactional management and @Transactional annotation of Spring Transaction 
+
+ <!-- enable the configuration of transactional behavior based on annotations -->
+	<tx:annotation-driven transaction-manager="txManager"/>
+
+	<!-- a PlatformTransactionManager is still required -->
+	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<!-- (this dependency is defined somewhere else) -->
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
+	In case the PlateformTransactionManager class has the bean name as = "transactionManager" ,
+	then we can omit the attribute "transaction-manager" from the transaction configuration annotation
+
+	
+Using @Transactional
+
+The @Transactional annotation may be placed before an interface definition, a method on an interface, a class definition, or a public method on a class.
+It is recommended to use @Transactional annotation on Concrete classes and not on interface level as Annotations are not inherited and there proxy can't be created.
+Also @Transactional annotation is recommended to use with public methods only as for other access modifiers, it can't be passed and get neglected.
+
+@Transactional Properties:-
+
+	Property		Type							Description
+	
+	propagation		enum: Propagation				optional propagation setting
+	isolation		enum: Isolation					optional isolation level
+	readOnly		boolean							read/write vs read-only transaction
+	timeout			int (in seconds granularity)	the transaction timeout
+	rollbackFor		an array of Class objects, which must be derived from Throwable	an optional array of exception classes which must cause rollback
+	rollbackForClassname	an array of class names. Classes must be derived from Throwable	an optional array of names of exception classes that must cause rollback
+	noRollbackFor	an array of Class objects, which must be derived from Throwable	an optional array of exception classes that must not cause rollback.
+	noRollbackForClassname	an array of String class names, which must be derived from Throwable	an optional array of names of exception classes that must not cause rollback
+	
+Transaction propagation Types:-
+	-@Transactional(propagation=Propagation.REQUIRED)
+	-@Transactional(propagation=Propagation.REQUIRES_NEW)
+	-@Transactional(propagation=Propagation.NESTED)
+	
+1)	 @Transactional(propagation=Propagation.REQUIRED)
+    public void doSomething() {
+        // access a database using a DAO
+    }
+	
+	When doSomething() is called it will start a new transaction if the caller has not already started a transaction.
+	If the caller of this method has already started a transaction then the callers' transaction is used 
+	and no new transaction is created (i.e. there is one transaction in play).
+	If an exception is thrown inside doSomething() then it will be rolled back, meaning that the caller will also see the transaction rolled back.
+	When doSomething() returns the transaction will not have been commited yet. It is the caller that will commit the transaction (or possibly rolled-back).
+
+2)	class Service {
+    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    public void doSomething() {
+        // access a database using a DAO
+		}
+	}
+	
+	When doSomething() is called it will always start a new transaction.
+	If the caller of this method has already started a transaction (TxnOuter) then the callers' transaction is suspended
+	and a new transaction (TxnInner) is created (i.e. there are two transactions in play).
+	If an exception is thrown inside doSomething() then TxnInner will be rolled back, but the "suspended" transaction from the caller (TxnOuter) is unaffected.
+	When doSomething() returns without an Exception it will commit the transaction (TxnInner). 
+	The caller's transaction (TxnOuter) will be resumed and be unaware that another transaction was committed.
+	The caller can then commit or roll-back TxnOuter as it sees fit.
+	The important point to note is that the Database views TxnOuter and TxnInner as completely independant transactions, and therefore two independant commits.
+	
+3) 	class Service {
+    @Transactional(propagation=Propagation.NESTED)
+    public void doSomething() {
+        // access a database using a DAO
+		}
+	}
+	
+	NESTED can only be used if your JDBC driver and/or database supports JDBC savepoints
+	When doSomething() is called it will start a new transaction if the caller has not already started a transaction.
+	If the caller of this method has already started a transaction then the callers' transaction is used and 
+	no new transaction is created (i.e. there is one transaction in play). However a "savepoint" is marked on the transaction when doSomething() is entered.
+	If an Exception is thrown inside doSomething() then the transaction can be partially rolled back the transaction to the "savepoint". 
+	The caller will continue with the transaction.
+	When doSomething() returns without an Exception it is the caller who will commit the entire transaction (or roll back).
+	The important point to note is that the Database views only one transaction and there is only one commit.
