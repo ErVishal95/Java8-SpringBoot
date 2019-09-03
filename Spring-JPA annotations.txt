@@ -413,7 +413,27 @@ NOTE:- When and Why you need to Implement equals() and hashCode() while using JP
 		MyEntity e1 = em.find(MyEntity.class, id);
 		MyEntity e2 = em.find(MyEntity.class, id);
 		Assert.assertTrue(e1.equals(e2));
-		
+
+
+Note:- Creating JPA Entity without primary key and composite key availability	:-
+
+for every table in database we have unique row number and this Row_Number can be utilized for creating the entity
+
+| row_id      | employee_id | project_name |
+|:------------|:------------|:-------------|
+| 1           | 1           | Stack01      |
+| 2           | 1           | Jira01       |
+| 3           | 1           | Github01     |
+| 4           | 2           | Stack01      |
+| 5           | 2           | Jira01       |
+| 6           | 3           | Jira01       |
+-------------------------------------------
+
+		@Id
+		@Column(name = "row_id")
+		private Integer id;
+
+- Indexing with JPA for Query tuning
 ********************************************************************************************************************************************************
 
 Spring JPA Transaction Management

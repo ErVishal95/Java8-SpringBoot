@@ -1,0 +1,72 @@
+																	Spring Tutorial:-
+Spring Framework - Spring is a lightwaight framework and provides integration of various other tools/frameworks.
+Spring Framework Modules - Core (IOC and Bean), DAO, Web MVC, ORM, AOP, Security etc.
+
+	Advantages - 	Predefined Templates
+				-	Spring framework provides templates for JDBC, Hibernate, JPA etc. technologies. So there is no need to write too much code.
+				Loose Coupling
+				-	The Spring applications are loosely coupled because of dependency injection.
+				Easy to test
+				-	The Dependency Injection makes easier to test the application.
+				Lightweight
+				-	Spring framework is lightweight because of its POJO implementation. 
+				Fast Development
+				-	The Dependency Injection feature of Spring Framework and it support to various frameworks makes the easy development of JavaEE application.
+#Spring IOC :-
+	The Spring IoC container is at the core of the Spring Framework. 
+	The container will create the objects, wire them together, configure them, and manage their complete life cycle from creation till destruction. 
+
+	Spring provides following two distinct types of containers:-
+	-	BeanFactory container
+	-	ApplicationContext container
+	
+***	*The BeanFactory enables you to read bean definitions and access them using the bean factory.
+	When using just the BeanFactory you would create one and read in some bean definitions in the XML format as follows:
+	
+-	InputStream is = new FileInputStream("beans.xml");
+	BeanFactory factory = new XmlBeanFactory(is);
+	 
+	//Get bean
+	HelloWorld obj = (HelloWorld) factory.getBean("helloWorld");
+	
+-	Resource resource = new FileSystemResource("beans.xml");
+	BeanFactory factory = new XmlBeanFactory(resource);
+	 
+-	ClassPathResource resource = new ClassPathResource("beans.xml");
+	BeanFactory factory = new XmlBeanFactory(resource);
+
+***	*The ApplicationContext container includes all functionality of the BeanFactory container.
+	ApplicationContext container adds more enterprise-specific functionality such as the ability to resolve textual messages from a properties file 
+	and the ability to publish application events to interested event listeners.
+	
+-	ApplicationContext context = new FileSystemXmlApplicationContext("beans.xml");
+	HelloWorld obj = (HelloWorld) context.getBean("helloWorld");
+	
+#Spring IoC vs DI :-
+-IoC: It is a programming technique in which object coupling is bound at run time by an assembler object and is typically not known at compile time using static analysis.
+-DI: DI is a pattern used to create instances of objects that other objects rely on without knowing at compile time which class will be used to provide that functionality.	
+
+
+#Ways to perform Dependency Injection in Spring framework
+-	By Constructor
+-	By Setter method
+-	By Interface Type
+	
+	#By Constructor
+	<bean id="e" class="com.javatpoint.Employee">  
+		<constructor-arg value="10" type="int"></constructor-arg>  
+	</bean>  
+	
+	#By Setter method
+	<bean id="obj" class="com.javatpoint.Employee">  
+		<property name="id">  
+		<value>20</value>  
+		</property>  
+		<property name="name">  
+		<value>Arun</value>  
+		</property>  
+	</bean>  
+
+WHY jAVA IS PASS BY VALUE	
+In Java, arguments are always passed by value regardless of the original variable type. 
+Each time a method is invoked, a copy for each argument is created in the stack memory and the copy version is passed to the method	
